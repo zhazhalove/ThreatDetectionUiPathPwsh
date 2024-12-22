@@ -23,6 +23,9 @@
 .PARAMETER Packages
     A string[] list of additional python packages to install into the mircomamba environment.
 
+ .PARAMETER DotEnvPath     
+    A string path to dotenv file containing environment variables to load into the runtime
+
 .EXAMPLE
     Invoke-THDScore -InputMessage "Sample input message" -Script "path\to\script.py"
 
@@ -31,6 +34,9 @@
 
 .EXAMPLE
     Invoke-THDScore -InputMessage "Sample input message" -Script "path\to\script.py" -PythonVersion "3.10" -Packages @("numpy", "pandas", "matplotlib")
+
+.EXAMPLE
+    Invoke-THDScore -InputMessage "Sample input message" -Script "path\to\script.py" -PythonVersion "3.10" -Packages @("numpy", "pandas", "matplotlib") -DotEnvPath "C:\some\file\.env"
 #>
 function Invoke-THDScore {
     param (
@@ -50,12 +56,22 @@ function Invoke-THDScore {
         [string]$MAMBA_ROOT_PREFIX = "$env:APPDATA\micromamba",
 
         [Parameter(Mandatory = $false)]
-        [string[]]$Packages
+        [string[]]$Packages,
+
+        [Parameter(Mandatory = $false, HelpMessage = "Path to dotenv file containing environment variables to load into the runtime")]
+        [string]$DotEnvPath
     )
 
 
     try {
-         # Validate input - throws exception if fails
+
+
+        if ($null -ne $DotEnvPath ) {
+            # Load .env variables into the PowerShell runtime
+            Import-DotEnv -EnvFilePath $DotEnvPath | Out-Null
+        }
+
+        # Validate input - throws exception if fails
         Test-InputMessage -InputMessage $InputMessage
 
         # Set MAMBA_ROOT_PREFIX environment variable
