@@ -51,7 +51,7 @@ Description = 'A module to classify threat detection artifacts'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @('MicromambaTools')
+# RequiredModules = @('MicromambaTools')
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
