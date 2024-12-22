@@ -25,14 +25,22 @@ This function orchestrates the validation of the micromamba environment and exec
 - **MAMBA_ROOT_PREFIX**: The root prefix for the micromamba environment. Defaults to `$env:APPDATA`. (Optional)
 - **Packages**: A string[] list of additional python packages to install into the micromamba environment. (Optional)
 - **DotEnvPath**: Path to dotenv file containing environment variables to load into the runtime (Optional)
+- **Temperature**: The temperature of the LLM. Defaults to 0.0 (Optional)
+- **ModelName**: The LLM model used. Defaults to "gpt-4o-mini" (Optional)
+- **MaxRetries**: The maximum number of retries for the LLM. Defaults to 3 (Optional)
 
 #### Examples
 
 ```powershell
 Invoke-THDScore -InputMessage "Sample input message" -Script "path\to\script.py"
+
 Invoke-THDScore -InputMessage "Sample input message" -Script "path\to\script.py" -PythonVersion "3.10"
+
 Invoke-THDScore -InputMessage "Sample input message" -Script "path\to\script.py" -PythonVersion "3.10" -Packages @("numpy", "pandas", "matplotlib")
+
 Invoke-THDScore -InputMessage "Sample input message" -Script "path\to\script.py" -PythonVersion "3.10" -Packages @("numpy", "pandas", "matplotlib") -DotEnvPath "\some\path\.env"
+
+Invoke-THDScore -Script "python_app" -PythonVersion "3.11" -MicromambaEnvName "langchain" -MAMBA_ROOT_PREFIX "\some\path\langchain" -Packages @("threat_detection_score_py_package") -DotEnvPath "C:\some\path.env" -Temperature 0.0 -ModelName "gpt-4o-mini" -MaxRetries 1 -InputMessage "some text"
 ```
 
 ### Test-InputMessage
