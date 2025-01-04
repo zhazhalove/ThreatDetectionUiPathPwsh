@@ -323,34 +323,42 @@ function New-THDScoreMicromambaEnv {
         Initialize-MambaRootPrefix -MAMBA_ROOT_PREFIX $MAMBA_ROOT_PREFIX
 
         # Download micromamba
-        if (-not (Get-MicromambaBinary)) {
-            throw [System.Exception]::new("FAIL - Download micromamba")
-        }
+        if ( -not (Test-Path -Path "$MAMBA_ROOT_PREFIX\micromamba.exe") ) {
 
-        # Create the micromamba environment
-        if (-not (New-MicromambaEnvironment -EnvName $MicromambaEnvName -PythonVersion $PythonVersion)) {
-            throw [System.Exception]::new("FAIL - Create micromamba environment - $MicromambaEnvName")
-        }
-
-        # Check if Packages parameter is provided
-        if ($null -ne $Packages -and $Packages.Count -gt 0) {
-            # Install packages
-            $PkgResults = Install-PackagesInMicromambaEnvironment -EnvName $MicromambaEnvName -Packages $Packages
-
-            foreach ($result in $PkgResults) {
-                if (-not $result["Success"]) {
-                    throw [System.Exception]::new("Package installation failed: $($result["PackageName"])")
-                }
+            if (-not (Get-MicromambaBinary)) {
+                throw [System.Exception]::new("FAIL - Download micromamba")
             }
         }
 
-        if ( (Test-MicromambaEnvironment -EnvName $MicromambaEnvName) ) {
-            return $true
+        # Create the micromamba environment
+        if (-not (Test-MicromambaEnvironment -EnvName $MicromambaEnvName) ) {
+
+            if (-not (New-MicromambaEnvironment -EnvName $MicromambaEnvName -PythonVersion $PythonVersion)) {
+                throw [System.Exception]::new("FAIL - Create micromamba environment - $MicromambaEnvName")
+            }
+
+            # Check if Packages parameter is provided
+            if ($null -ne $Packages -and $Packages.Count -gt 0) {
+                # Install packages
+                $PkgResults = Install-PackagesInMicromambaEnvironment -EnvName $MicromambaEnvName -Packages $Packages
+
+                foreach ($result in $PkgResults) {
+                    if (-not $result["Success"]) {
+                        throw [System.Exception]::new("Package installation failed: $($result["PackageName"])")
+                    }
+                }
+            }
+
+            if ( (Test-MicromambaEnvironment -EnvName $MicromambaEnvName) ) {
+                return $true
+            }
+            else {
+                throw [System.Exception]::new("Test-MicromambaEnvironment failed!")
+            }
         }
         else {
-            throw [System.Exception]::new("Test-MicromambaEnvironment failed!")
+            return $true
         }
-
     } catch {
         throw [System.Exception]::new("Error in New-THDScoreMicromambaEnv: $($_.Exception.Message)", $_.Exception)
     }
