@@ -252,9 +252,6 @@ function Invoke-THDScoreRunOnly {
                 # Load .env variables into the PowerShell runtime
                 Import-DotEnv -EnvFilePath $DotEnvPath | Out-Null
             }
-    
-            # Validate input - throws exception if fails
-            # Test-InputMessage -InputMessage $InputMessage
             
             try {
                 # Validate input - throws exception if fails
