@@ -97,8 +97,13 @@ function Invoke-THDScore {
             Import-DotEnv -EnvFilePath $DotEnvPath | Out-Null
         }
 
-        # Validate input - throws exception if fails
-        Test-InputMessage -InputMessage $InputMessage
+        try {
+            # Validate input - throws exception if fails
+            Test-InputMessage -InputMessage $InputMessage
+        }
+        catch {
+            $InputMessage = Remove-UnsafeString -InputString $InputMessage
+        }
 
         # Set MAMBA_ROOT_PREFIX environment variable
         Initialize-MambaRootPrefix -MAMBA_ROOT_PREFIX $MAMBA_ROOT_PREFIX
@@ -249,7 +254,16 @@ function Invoke-THDScoreRunOnly {
             }
     
             # Validate input - throws exception if fails
-            Test-InputMessage -InputMessage $InputMessage
+            # Test-InputMessage -InputMessage $InputMessage
+            
+            try {
+                # Validate input - throws exception if fails
+                Test-InputMessage -InputMessage $InputMessage
+            }
+            catch {
+                $InputMessage = Remove-UnsafeString -InputString $InputMessage
+            }
+
             
             # Execute the Python script with new parameters
             $arguments = @(
@@ -459,4 +473,48 @@ function Test-InputMessage {
     }
 }
 
-Export-ModuleMember -Function Remove-THDScoreMicromambaEnv, New-THDScoreMicromambaEnv, Invoke-THDScoreRunOnly, Invoke-THDScore, Test-InputMessage
+<#
+.SYNOPSIS
+    Sanitizes the input string to remove unsafe characters and ensures it adheres to safe standards.
+
+.DESCRIPTION
+    The Remove-UnsafeString function validates the input string, checks for unsafe characters, and removes them.
+    If violations are found, they are logged or thrown as errors.
+
+.PARAMETER InputString
+    The string to sanitize.
+
+.EXAMPLE
+    Remove-UnsafeString -InputString "Hello, World!"
+
+    Returns: "Hello, World!"
+
+.EXAMPLE
+    Remove-UnsafeString -InputString "Hello <script>"
+
+    Returns: "Hello"
+
+#>
+function Remove-UnsafeString {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$InputString
+    )
+
+    # Validate the input using Test-InputMessage
+    try {
+        Test-InputMessage -InputMessage $InputString
+    } catch {
+        Write-Verbose "Input validation failed: $_"
+        # Sanitize the string by removing unsafe characters
+        $sanitizedString = $InputString -replace '[^a-zA-Z0-9\s\.,\-_]', ''
+        return $sanitizedString
+    }
+
+    # Return the input if it is valid
+    return $InputString
+}
+
+
+Export-ModuleMember -Function Remove-UnsafeString, Remove-THDScoreMicromambaEnv, New-THDScoreMicromambaEnv, Invoke-THDScoreRunOnly, Invoke-THDScore, Test-InputMessage
