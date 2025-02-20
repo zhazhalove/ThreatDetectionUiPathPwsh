@@ -7,7 +7,7 @@ This project provides PowerShell functions `Invoke-THDScore` and `Invoke-THDScor
 ## Dependencies
 
 - **Requires**: MicromambaTools PowerShell module available at https://github.com/zhazhalove/MicromambaTools
-- **Optional Demo**: Python package for cybersecurity threat analysis and detection at https://github.com/zhazhalove/threat_detection_score_py_package 
+- **Requires**: Python package for cybersecurity threat analysis and detection at https://github.com/zhazhalove/threat_detection_score_py_package 
 
 ## Functions
 
